@@ -206,13 +206,15 @@ class Button:
 
 
 class StoneTowerFirstType(StoneTower):
-    pass
+    def attack(self, enemy):
+        if super(StoneTowerFirstType, self).attack(enemy):
+            self.stones[-1].goal_x -= 35
 
 
 class StoneTowerSecondType(StoneTower):
     def attack(self, enemy):
         if super(StoneTowerSecondType, self).attack(enemy):
-            self.stones[-1].goal_x -= 25
+            self.stones[-1].goal_x -= 35
 
     def draw(self, screen):
         mx, my = -7.119999999993524, -15
