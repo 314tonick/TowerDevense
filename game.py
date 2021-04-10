@@ -193,6 +193,8 @@ try:
                                 if addStoneTower(selected_tower.type):
                                     COINS -= PRICES[selected_tower.type][0]
                                 selected_tower = None
+                        elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                            state = 'PAUSE'
                     for number in range(3):
                         if addStoneTowerButtons[number].try_push(events, eventTypeRequire=pygame.MOUSEBUTTONDOWN):
                             selected_tower = addStoneTowerTowers[number]
@@ -229,14 +231,18 @@ try:
                             sys.exit()
                         elif e.type == pygame.MOUSEBUTTONUP:
                             state = 'NORMAL'
+                        elif e.type == pygame.KEYUP:
+                            state = 'NORMAL'
             elif state == 'WIN':
                 screen.fill((0, 255, 0))
                 font_ = font.Font(open_file('font.ttf'), 250)
-                screen.blit(font_.render('YOU WIN!!!', True, (0, 0, 0)), (80, 100))
+                screen.blit(font_.render('YOU WIN!!!', True, (0, 0, 0)), (80, 150))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         sys.exit()
                     elif e.type == pygame.MOUSEBUTTONUP:
+                        sys.exit()
+                    elif e.type == pygame.KEYUP:
                         sys.exit()
             elif state == 'LOST':
                 screen.fill((255, 0, 0))
@@ -246,6 +252,8 @@ try:
                     if e.type == pygame.QUIT:
                         sys.exit()
                     elif e.type == pygame.MOUSEBUTTONUP:
+                        sys.exit()
+                    elif e.type == pygame.KEYUP:
                         sys.exit()
             pygame.time.delay(DELAY)
             pygame.display.flip()
