@@ -28,21 +28,15 @@ WAIT_BETWEEN_WAVES = 100
 SCORPION, OLD_MAN, GOBLIN = 'scorpion', 'oldMan', 'goblin'
 STONE_TOWER_CLASSES = [StoneTowerFirstType, StoneTowerSecondType, StoneTowerThirdType]
 WAVES = [
-    # Wave([SCORPION, OLD_MAN, GOBLIN] * 10, [0, 1, 2] * 10, [20, 40, 60] * 10, 1.2, 100, [2.5] * 30, [20] * 30),
-    Wave([SCORPION] * 1, [0] * 5, [300] * 5, 10, 80, [2000] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
-
+    Wave([SCORPION] * 5, [1] * 5, [10] * 5, 1.3, 100, [1] * 5, [10] * 5),
+    Wave([SCORPION] * 10, [0, 1, 2] * 4, [10, 20, 30, 40, 50] * 2, 1.7, 100, [1, 2] * 5, [10, 15, 20] * 4),
+    Wave([SCORPION], [1], [200], 1, 1, [10], [50]),
+    Wave([OLD_MAN] * 5, [1] * 5, [20] * 5, 1.3, 90, [2] * 5, [30] * 5),
+    Wave([SCORPION, OLD_MAN] * 5, [0, 1, 2] * 4, [20, 30, 40, 50] * 3, 1.5, 130, [2, 3] * 5, [20, 30, 40] * 5),
+    Wave([SCORPION, OLD_MAN], [0, 2], [300, 300], 1.2, 1, [10], [70])
 ]
 LIVES = 20
 PRICES = [[50, 20, 30, 25], [90, 30, 50, 45], [150, 50, 100, 75]]
-SPEED = 1
 DELAY = 4
 STONE_TOWER = 'stone_tower'
 STONE_TOWER_IMG = [
@@ -57,11 +51,11 @@ STONE_IMGS = [
     ['40.png', ['41.png', '42.png', '43.png', '44.png']],
 ]
 STONE_TOWERS = [
-    {'type_': 0, 'uron': 10, 'speed': 0.3, 'range_': 200},
-    {'type_': 1, 'uron': 10, 'speed': 0.3, 'range_': 200},
-    # {'type': 1, 'uron': 20, 'speed': 0.4, 'range_': 260},
-    {'type_': 2, 'uron': 35, 'speed': 0.6, 'range_': 330},
+    {'type_': 0, 'uron': 10, 'speed': 0.4, 'range_': 150},
+    # {'type_': 1, 'uron': 10, 'speed': 0.3, 'range_': 200},
+    {'type_': 1, 'uron': 20, 'speed': 0.5, 'range_': 180},
+    {'type_': 2, 'uron': 35, 'speed': 0.6, 'range_': 220},
 ]
-COINS = 300
+COINS = 100
 TOWER_WIDTH, TOWER_HEIGHT = 0.8, 0.8
 TOWER_SPEED = 0.4
