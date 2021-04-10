@@ -136,8 +136,6 @@ try:
                 bas.draw(screen)
             for button in addStoneTowerButtons:
                 button.draw(screen)
-            if selected_tower:
-                selected_tower.draw(screen)
 
             if not pause:
                 if selected_tower:
