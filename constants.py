@@ -28,8 +28,8 @@ WAIT_BETWEEN_WAVES = 100
 SCORPION, OLD_MAN, GOBLIN = 'scorpion', 'oldMan', 'goblin'
 STONE_TOWER_CLASSES = [StoneTowerFirstType, StoneTowerSecondType, StoneTowerThirdType]
 WAVES = [
-    Wave([SCORPION, OLD_MAN, GOBLIN] * 10, [0, 1, 2] * 10, [20, 40, 60] * 10, 1.2, 100, [2.5] * 30, [20] * 30),
-    # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
+    # Wave([SCORPION, OLD_MAN, GOBLIN] * 10, [0, 1, 2] * 10, [20, 40, 60] * 10, 1.2, 100, [2.5] * 30, [20] * 30),
+    Wave([SCORPION] * 1, [0] * 5, [300] * 5, 10, 80, [2000] * 5, [20] * 5),
     # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
     # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),
     # Wave([SCORPION] * 1, [0] * 5, [300] * 5, 1, 80, [2] * 5, [20] * 5),

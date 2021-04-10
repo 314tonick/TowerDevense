@@ -81,7 +81,7 @@ try:
         addStoneTowerButtons = []
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
-        pause = False
+        state = "NORMAL" #  NORMAL, PAUSE, WIN, LOST
         for number in range(3):
             x, y = pygame.mouse.get_pos()
             addStoneTowerTowers.append(
@@ -120,118 +120,133 @@ try:
         paths = [[tuple(map(int, line.split())) for line in open_file(
             'paths', pathname).read().splitlines()] for pathname in listdir(resource_path('paths'))]
         while True:
-            screen.blit(background, (0, 0))
-
-            # ----------------------О-Т-Р-И-С-О-В-К-А--U-I---------------------
-            for UI_element in UI_elements:
-                UI_element.draw(screen)
-            screen.blit(cerdce, (WIDTH - 190, 4))
-            screen.blit(font_.render(str(LIVES), True, (180, 0, 0)), (WIDTH - 165, 4))
-            screen.blit(coin, (WIDTH - 190, 90))
-            screen.blit(font_.render(str(COINS), True, (180, 180, 0)), (WIDTH - 165, 90))
-            # -----О-Т-Р-И-С-О-В-К-А--О-С-Т-А-Л-Ь-Н-Ы-Х---Э-Л-М-Е-Н-Т-О-В-------
-            for geroy in geroes:
-                geroy.draw()
-            for bas in bashni:
-                bas.draw(screen)
-            for button in addStoneTowerButtons:
-                button.draw(screen)
-
-            if not pause:
-                if selected_tower:
-                    # bashni[-1].x -= bashni[-1].width // 2
-                    #                 bashni[-1].y -= bashni[-1].height // 2
-                    selected_tower.x, selected_tower.y = pygame.mouse.get_pos()
-                    selected_tower.x -= selected_tower.width // 2
-                    selected_tower.y -= selected_tower.height // 2
-                    selected_tower.draw(screen)
-                iteration_number += 1
-                if isend and len(geroes):
-                    iteration_number -= 1
-                elif isend:
-                    isend = False
-                try:
-                    if iteration_number >= 0 and iteration_number % WAVES[wave_number].wait == 0:
-                        try:
-                            path, name, speed, lives, fine, reward = WAVES[wave_number].next()
-                            geroes.append(Enemy(images[name], screen, paths[path], name, speed, lives, fine, reward))
-                        except StopIteration:
-                            wave_number += 1
-                            iteration_number = - WAIT_BETWEEN_WAVES
-                            isend = True
-                except IndexError:
-                    print('В Ы   В Ы И Г Р А Л И ! ! !')
-                    sys.exit()
+            if state == 'PAUSE' or state == 'NORMAL':
+                screen.blit(background, (0, 0))
+                # ----------------------О-Т-Р-И-С-О-В-К-А--U-I---------------------
+                for UI_element in UI_elements:
+                    UI_element.draw(screen)
+                screen.blit(cerdce, (WIDTH - 190, 4))
+                screen.blit(font_.render(str(LIVES), True, (180, 0, 0)), (WIDTH - 165, 4))
+                screen.blit(coin, (WIDTH - 190, 90))
+                screen.blit(font_.render(str(COINS), True, (180, 180, 0)), (WIDTH - 165, 90))
+                # -----О-Т-Р-И-С-О-В-К-А--О-С-Т-А-Л-Ь-Н-Ы-Х---Э-Л-М-Е-Н-Т-О-В-------
                 for geroy in geroes:
-                    if geroy.move():
-                        LIVES -= geroy.fine
-                        geroes.remove(geroy)
+                    geroy.draw()
                 for bas in bashni:
-                    for enemy in bas.update() + bas.update():
-                        try:
-                            enemy.lives -= bas.uron
-                            enemy.now_uron -= bas.uron
-                            if enemy.lives <= 0:
-                                geroes.remove(enemy)
-                                COINS += enemy.reward
-                        except ValueError:
-                            pass
-                for bas in bashni:
+                    bas.draw(screen)
+                for button in addStoneTowerButtons:
+                    button.draw(screen)
+                if state == 'NORMAL':
+                    if selected_tower:
+                        # bashni[-1].x -= bashni[-1].width // 2
+                        #                 bashni[-1].y -= bashni[-1].height // 2
+                        selected_tower.x, selected_tower.y = pygame.mouse.get_pos()
+                        selected_tower.x -= selected_tower.width // 2
+                        selected_tower.y -= selected_tower.height // 2
+                        selected_tower.draw(screen)
+                    iteration_number += 1
+                    if isend and len(geroes):
+                        iteration_number -= 1
+                    elif isend:
+                        isend = False
+                    try:
+                        if iteration_number >= 0 and iteration_number % WAVES[wave_number].wait == 0:
+                            try:
+                                path, name, speed, lives, fine, reward = WAVES[wave_number].next()
+                                geroes.append(Enemy(images[name], screen, paths[path], name, speed, lives, fine, reward))
+                            except StopIteration:
+                                wave_number += 1
+                                iteration_number = - WAIT_BETWEEN_WAVES
+                                isend = True
+                    except IndexError:
+                        state = 'WIN'
                     for geroy in geroes:
-                        x, y = geroy.get_pos(95)
-                        bx, by = bas.x + bas.width // 2, bas.y + bas.height // 2
-                        if get_distant(x, y, bx, by) <= bas.range and geroy.lives - geroy.now_uron > 0:
-                            print(geroy.lives, geroy.now_uron)
-                            bas.attack(geroy)
-                            break
-                if LIVES <= 0:
-                    print('В Ы   П Р О И Г Р А Л И  ! ! !')
-                    sys.exit()
-                events = pygame.event.get()
-                for event in events:
-                    if event.type == pygame.QUIT:
-                        sys.exit()
-                    elif event.type == pygame.MOUSEBUTTONUP:
-                        if selected_tower:
-                            if addStoneTower(selected_tower.type):
-                                COINS -= PRICES[selected_tower.type][0]
-                            selected_tower = None
-                for number in range(3):
-                    if addStoneTowerButtons[number].try_push(events, eventTypeRequire=pygame.MOUSEBUTTONDOWN):
-                        selected_tower = addStoneTowerTowers[number]
-                    # elif event.type == pygame.KEYUP and event.key == pygame.K_z:
-                    #     print(bashni[0].x, bashni[0].y)
-                    #     self = bashni[0]
-                    #     print(self.x, self.y + self.pos + self.imgs[self.level][0].get_height() - 2)
-                if button_pause.try_push(events):
-                    pause = True
-                for bas in bashni:
-                    if pygame.rect.Rect(bas.x, bas.y, bas.width, bas.height + 50).collidepoint(*pygame.mouse.get_pos()):
-                        bas.draw_circle(screen)
-                        radius = bas.range
-                        if bas.sellButton.try_push(events, bas.x + bas.width // 2 - radius,
-                                                   bas.y + bas.height // 2 - radius):
-                            bashni.remove(bas)
-                            COINS += PRICES[bas.type][3]
-                        elif bas.upgradeButton.try_push(events, bas.x + bas.width // 2 - radius,
-                                                        bas.y + bas.height // 2 - radius) and bas.level <= 1 and COINS >= \
-                                PRICES[bas.type][bas.level + 1]:
-                            COINS -= PRICES[bas.type][bas.level + 1]
-                            bas.upgrade()
-                for y in range(len(TowerPlaces)):
-                    for x in range(len(TowerPlaces[0])):
-                        if TowerPlaces[y][x]:
-                            pass
-                            # pygame.draw.rect(screen, (0, 255, 0), (x * 10, y * 10, 10, 10))
-            else:
-                surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-                surface.fill((0, 0, 0, 100))
-                screen.blit(surface, (0, 0))
+                        if geroy.move():
+                            LIVES -= geroy.fine
+                            geroes.remove(geroy)
+                    for bas in bashni:
+                        for enemy in bas.update() + bas.update():
+                            try:
+                                enemy.lives -= bas.uron
+                                enemy.now_uron -= bas.uron
+                                if enemy.lives <= 0:
+                                    geroes.remove(enemy)
+                                    COINS += enemy.reward
+                            except ValueError:
+                                pass
+                    for bas in bashni:
+                        for geroy in geroes:
+                            x, y = geroy.get_pos(95)
+                            bx, by = bas.x + bas.width // 2, bas.y + bas.height // 2
+                            if get_distant(x, y, bx, by) <= bas.range and geroy.lives - geroy.now_uron > 0:
+                                print(geroy.lives, geroy.now_uron)
+                                bas.attack(geroy)
+                                break
+                    if LIVES <= 0:
+                        state = 'LOST'
+                    events = pygame.event.get()
+                    for event in events:
+                        if event.type == pygame.QUIT:
+                            sys.exit()
+                        elif event.type == pygame.MOUSEBUTTONUP:
+                            if selected_tower:
+                                if addStoneTower(selected_tower.type):
+                                    COINS -= PRICES[selected_tower.type][0]
+                                selected_tower = None
+                    for number in range(3):
+                        if addStoneTowerButtons[number].try_push(events, eventTypeRequire=pygame.MOUSEBUTTONDOWN):
+                            selected_tower = addStoneTowerTowers[number]
+                        # elif event.type == pygame.KEYUP and event.key == pygame.K_z:
+                        #     print(bashni[0].x, bashni[0].y)
+                        #     self = bashni[0]
+                        #     print(self.x, self.y + self.pos + self.imgs[self.level][0].get_height() - 2)
+                    if button_pause.try_push(events):
+                        state = 'PAUSE'
+                    for bas in bashni:
+                        if pygame.rect.Rect(bas.x, bas.y, bas.width, bas.height + 50).collidepoint(*pygame.mouse.get_pos()):
+                            bas.draw_circle(screen)
+                            radius = bas.range
+                            if bas.sellButton.try_push(events, bas.x + bas.width // 2 - radius,
+                                                       bas.y + bas.height // 2 - radius):
+                                bashni.remove(bas)
+                                COINS += PRICES[bas.type][3]
+                            elif bas.upgradeButton.try_push(events, bas.x + bas.width // 2 - radius,
+                                                            bas.y + bas.height // 2 - radius) and bas.level <= 1 and COINS >= \
+                                    PRICES[bas.type][bas.level + 1]:
+                                COINS -= PRICES[bas.type][bas.level + 1]
+                                bas.upgrade()
+                    for y in range(len(TowerPlaces)):
+                        for x in range(len(TowerPlaces[0])):
+                            if TowerPlaces[y][x]:
+                                pass
+                                # pygame.draw.rect(screen, (0, 255, 0), (x * 10, y * 10, 10, 10))
+                else:
+                    surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                    surface.fill((0, 0, 0, 100))
+                    screen.blit(surface, (0, 0))
+                    for e in pygame.event.get():
+                        if e.type == pygame.QUIT:
+                            sys.exit()
+                        elif e.type == pygame.MOUSEBUTTONUP:
+                            state = 'NORMAL'
+            elif state == 'WIN':
+                screen.fill((0, 255, 0))
+                font_ = font.Font(open_file('font.ttf'), 250)
+                screen.blit(font_.render('YOU WIN!!!', True, (0, 0, 0)), (80, 100))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         sys.exit()
                     elif e.type == pygame.MOUSEBUTTONUP:
-                        pause = False
+                        sys.exit()
+            elif state == 'LOST':
+                screen.fill((255, 0, 0))
+                font_ = font.Font(open_file('font.ttf'), 250)
+                screen.blit(font_.render('YOU LOST!!!', True, (0, 0, 0)), (0, 150))
+                for e in pygame.event.get():
+                    if e.type == pygame.QUIT:
+                        sys.exit()
+                    elif e.type == pygame.MOUSEBUTTONUP:
+                        sys.exit()
             pygame.time.delay(DELAY)
             pygame.display.flip()
 
