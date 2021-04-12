@@ -33,7 +33,6 @@ try:
     def main():
         from os import listdir
         import pygame
-        from pygame import font
 
         from constants import PRICES, STONE_TOWER_CLASSES
         from enemy import Enemy
@@ -81,7 +80,7 @@ try:
         addStoneTowerButtons = []
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
-        state = "NORMAL" #  NORMAL, PAUSE, WIN, LOST
+        state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
             addStoneTowerTowers.append(
@@ -104,14 +103,14 @@ try:
             images.update(
                 {hero_name: [pygame.transform.scale(load_img(hero_name, 'walk', filename), (HERO_WIDTH, HERO_HEIGHT))
                              for filename in listdir(resource_path(hero_name, 'walk'))]})
-
+        button_start = Button(pygame.transform.scale(load_img('buttons', 'start.png'), (400, 400)), 350, 250)
         coin = pygame.transform.scale(load_img('buttons', 'money.png'), (180, 80))
         cerdce = pygame.transform.scale(load_img('buttons', 'lives.png'), (180, 80))
 
         background = load_img('game_background.png')
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        font_ = font.Font(resource_path('font.ttf'), 60)
+        font = pygame.font.Font(resource_path('font.ttf'), 60)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0)
         isend = False
@@ -126,9 +125,9 @@ try:
                 for UI_element in UI_elements:
                     UI_element.draw(screen)
                 screen.blit(cerdce, (WIDTH - 190, 4))
-                screen.blit(font_.render(str(LIVES), True, (180, 0, 0)), (WIDTH - 165, 4))
+                screen.blit(font.render(str(LIVES), True, (180, 0, 0)), (WIDTH - 165, 4))
                 screen.blit(coin, (WIDTH - 190, 90))
-                screen.blit(font_.render(str(COINS), True, (180, 180, 0)), (WIDTH - 165, 90))
+                screen.blit(font.render(str(COINS), True, (180, 180, 0)), (WIDTH - 165, 90))
                 # -----О-Т-Р-И-С-О-В-К-А--О-С-Т-А-Л-Ь-Н-Ы-Х---Э-Л-М-Е-Н-Т-О-В-------
                 for geroy in geroes:
                     geroy.draw()
@@ -151,7 +150,8 @@ try:
                         if iteration_number >= 0 and iteration_number % WAVES[wave_number].wait == 0:
                             try:
                                 path, name, speed, lives, fine, reward = WAVES[wave_number].next()
-                                geroes.append(Enemy(images[name], screen, paths[path], name, speed, lives, fine, reward))
+                                geroes.append(
+                                    Enemy(images[name], screen, paths[path], name, speed, lives, fine, reward))
                             except StopIteration:
                                 wave_number += 1
                                 iteration_number = - WAIT_BETWEEN_WAVES
@@ -198,7 +198,8 @@ try:
                     if button_pause.try_push(events):
                         state = 'PAUSE'
                     for bas in bashni:
-                        if pygame.rect.Rect(bas.x, bas.y, bas.width, bas.height + 50).collidepoint(*pygame.mouse.get_pos()):
+                        if pygame.rect.Rect(bas.x, bas.y, bas.width, bas.height + 50).collidepoint(
+                                *pygame.mouse.get_pos()):
                             bas.draw_circle(screen)
                             radius = bas.range
                             if bas.sellButton.try_push(events, bas.x + bas.width // 2 - radius,
@@ -228,8 +229,8 @@ try:
                             state = 'NORMAL'
             elif state == 'WIN':
                 screen.fill((0, 255, 0))
-                font_ = font.Font(open_file('font.ttf'), 250)
-                screen.blit(font_.render('YOU WIN!!!', True, (0, 0, 0)), (80, 150))
+                font = font.Font(open_file('font.ttf'), 250)
+                screen.blit(font.render('YOU WIN!!!', True, (0, 0, 0)), (80, 150))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         sys.exit()
@@ -239,8 +240,8 @@ try:
                         sys.exit()
             elif state == 'LOST':
                 screen.fill((255, 0, 0))
-                font_ = font.Font(open_file('font.ttf'), 250)
-                screen.blit(font_.render('YOU LOST!!!', True, (0, 0, 0)), (0, 150))
+                font = font.Font(open_file('font.ttf'), 250)
+                screen.blit(font.render('YOU LOST!!!', True, (0, 0, 0)), (0, 150))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         sys.exit()
@@ -248,11 +249,23 @@ try:
                         sys.exit()
                     elif e.type == pygame.KEYUP:
                         sys.exit()
+            elif state == 'IN_START_MENU':
+                screen.blit(background, (0, 0))
+                font_ = pygame.font.Font(resource_path('font.ttf'), 200)
+                screen.blit(font_.render('PYGAME', True, (100, 49, 33)), (220, 20))
+                button_start.draw(screen)
+                events = pygame.event.get()
+                for e in events:
+                    if e.type == pygame.QUIT:
+                        sys.exit()
+                if button_start.try_push(events):
+                    state = 'NORMAL'
             pygame.time.delay(DELAY)
             pygame.display.flip()
 
 
     if __name__ == '__main__':
         main()
-finally:
-    pass
+except Exception as error:
+    from tkinter.messagebox import showerror
+    showerror('Error:', str(error.__class__) + str(error.args))
