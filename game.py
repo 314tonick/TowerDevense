@@ -179,7 +179,6 @@ try:
                             x, y = geroy.get_pos(95)
                             bx, by = bas.x + bas.width // 2, bas.y + bas.height // 2
                             if get_distant(x, y, bx, by) <= bas.range and geroy.lives - geroy.now_uron > 0:
-                                print(geroy.lives, geroy.now_uron)
                                 bas.attack(geroy)
                                 break
                     if LIVES <= 0:
@@ -198,10 +197,6 @@ try:
                     for number in range(3):
                         if addStoneTowerButtons[number].try_push(events, eventTypeRequire=pygame.MOUSEBUTTONDOWN):
                             selected_tower = addStoneTowerTowers[number]
-                        # elif event.type == pygame.KEYUP and event.key == pygame.K_z:
-                        #     print(bashni[0].x, bashni[0].y)
-                        #     self = bashni[0]
-                        #     print(self.x, self.y + self.pos + self.imgs[self.level][0].get_height() - 2)
                     if button_pause.try_push(events):
                         state = 'PAUSE'
                     for bas in bashni:
