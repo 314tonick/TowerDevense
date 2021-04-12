@@ -138,8 +138,6 @@ try:
                     button.draw(screen)
                 if state == 'NORMAL':
                     if selected_tower:
-                        # bashni[-1].x -= bashni[-1].width // 2
-                        #                 bashni[-1].y -= bashni[-1].height // 2
                         selected_tower.x, selected_tower.y = pygame.mouse.get_pos()
                         selected_tower.x -= selected_tower.width // 2
                         selected_tower.y -= selected_tower.height // 2
