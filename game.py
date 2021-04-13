@@ -39,8 +39,8 @@ try:
         from tower import StoneTower, StoneTowerSecondType, Button, StoneTowerThirdType
         import sys
         from constants import WIDTH, HEIGHT, HERO_WIDTH, HERO_HEIGHT, GOBLIN, SCORPION, STONE_TOWERS, \
-            OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, WAVES, \
-            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS
+            OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
+            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS
 
         def addStoneTower(num):
             px, py = pygame.mouse.get_pos()
@@ -72,6 +72,7 @@ try:
                     return False
                 return True
 
+        WAVES = LEVELS[0].waves
         pygame.init()
         pygame.mixer.music.load(resource_path('fone.wav'))
         geroes = []
@@ -229,7 +230,7 @@ try:
                             state = 'NORMAL'
             elif state == 'WIN':
                 screen.fill((0, 255, 0))
-                font = font.Font(open_file('font.ttf'), 250)
+                font = pygame.font.Font(open_file('font.ttf'), 250)
                 screen.blit(font.render('YOU WIN!!!', True, (0, 0, 0)), (80, 150))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
@@ -240,7 +241,7 @@ try:
                         sys.exit()
             elif state == 'LOST':
                 screen.fill((255, 0, 0))
-                font = font.Font(open_file('font.ttf'), 250)
+                font = pygame.font.Font(open_file('font.ttf'), 250)
                 screen.blit(font.render('YOU LOST!!!', True, (0, 0, 0)), (0, 150))
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
@@ -251,8 +252,8 @@ try:
                         sys.exit()
             elif state == 'IN_START_MENU':
                 screen.blit(background, (0, 0))
-                font_ = pygame.font.Font(resource_path('font.ttf'), 200)
-                screen.blit(font_.render('PYGAME', True, (100, 49, 33)), (220, 20))
+                font_ = pygame.font.Font(resource_path('font.ttf'), 150)
+                screen.blit(font_.render('TOWER DEVENSE', True, (100, 49, 33)), (50, 20))
                 button_start.draw(screen)
                 events = pygame.event.get()
                 for e in events:
@@ -268,4 +269,5 @@ try:
         main()
 except Exception as error:
     from tkinter.messagebox import showerror
+
     showerror('Error:', str(error.__class__) + str(error.args))

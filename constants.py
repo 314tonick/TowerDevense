@@ -1,4 +1,21 @@
 from tower import StoneTowerFirstType, StoneTowerSecondType, StoneTowerThirdType
+from utils import resource_path
+
+
+def get_levels():
+    f = open(resource_path('levels.txt'))
+    i = 0
+    le = []
+    for line in f.readlines():
+        le.append(Level(i, eval(line)))
+    f.close()
+    return le
+
+
+class Level:
+    def __init__(self, number, waves):
+        self.waves = waves
+        self.number = number
 
 
 class Wave:
@@ -27,19 +44,6 @@ HERO_WIDTH = HERO_HEIGHT = 100
 WAIT_BETWEEN_WAVES = 100
 SCORPION, OLD_MAN, GOBLIN = 'scorpion', 'oldMan', 'goblin'
 STONE_TOWER_CLASSES = [StoneTowerFirstType, StoneTowerSecondType, StoneTowerThirdType]
-WAVES = [
-    Wave([SCORPION] * 5, [1] * 5, [10] * 5, 1.5, 100, [1] * 5, [10] * 5),
-    Wave([SCORPION] * 10, [0, 1, 2] * 4, [10, 20, 30, 40, 50] * 2, 1.7, 100, [1, 2] * 5, [10, 15, 20] * 4),
-    Wave([SCORPION], [1], [200], 1, 1, [10], [50]),
-    Wave([OLD_MAN] * 5, [1] * 5, [20] * 5, 2, 90, [2] * 5, [30] * 5),
-    Wave([SCORPION, OLD_MAN] * 5, [0, 1, 2] * 4, [20, 30, 40, 50] * 3, 1.8, 130, [2, 3] * 5, [20, 30, 40] * 5),
-    Wave([SCORPION, OLD_MAN], [0, 2], [300, 400], 1.2, 200, [10, 15], [70, 100]),
-    Wave([GOBLIN] * 10, [0, 2] * 5, [40] * 10, 2.5, 100, [3] * 10, [10, 15, 20] * 5),
-    Wave([SCORPION, OLD_MAN, GOBLIN] * 5, [0, 1, 2] * 10, [10, 20, 30, 40, 50] * 6, 2, 150, [1, 2, 3, 4, 5] * 6,
-         [10, 15, 20, 25, 30] * 6),
-    Wave([SCORPION, OLD_MAN, GOBLIN], [0, 1, 2], [500, 600, 700], 1.2, 300, [10, 15, 20], [100, 100, 100]),
-    Wave([GOBLIN], [1], [2000], 1, 1, [20], [300])
-]
 LIVES = 20
 PRICES = [[50, 20, 30, 25], [90, 30, 50, 45], [150, 50, 100, 75]]
 DELAY = 4
@@ -64,3 +68,5 @@ STONE_TOWERS = [
 COINS = 100
 TOWER_WIDTH, TOWER_HEIGHT = 0.8, 0.8
 TOWER_SPEED = 0.4
+LEVELS = get_levels()
+NUMBER_OF_LEVELS = len(LEVELS)
