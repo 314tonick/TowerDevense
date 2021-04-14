@@ -182,7 +182,8 @@ class Stone:
 
 
 class Button:
-    def __init__(self, img, x, y, cost: int = None):
+    def __init__(self, img, x, y, cost: int = None, **kwargs):
+        self.kwargs = kwargs
         self.x, self.y, self.img = x, y, img
         self.width, self.height = self.img.get_size()
         self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)

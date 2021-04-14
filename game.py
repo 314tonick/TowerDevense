@@ -2,6 +2,12 @@ try:
     from utils import *
 
 
+    # def mixSurfaces(surface: pygame.Surface, *surfaces: pygame.Surface):
+    #     ret = surface.copy()
+    #     for sur in surfaces:
+    #         ret.blit(sur)
+
+
     def whatTheNewTower():
         keys = pygame.key.get_pressed()
         for b in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:
@@ -14,7 +20,7 @@ try:
         return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
 
 
-    def load_images(root, lst, width=1, height=1):
+    def load_images(root, lst, width: float = 1, height: float = 1):
         r = []
         if isinstance(lst, str):
             img = load_img(root, lst)
@@ -40,7 +46,7 @@ try:
         import sys
         from constants import WIDTH, HEIGHT, HERO_WIDTH, HERO_HEIGHT, GOBLIN, SCORPION, STONE_TOWERS, \
             OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
-            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS
+            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS, NUMBER_OF_LEVELS
 
         def addStoneTower(num):
             px, py = pygame.mouse.get_pos()
@@ -81,6 +87,7 @@ try:
         addStoneTowerButtons = []
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
+        level = 0
         state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
@@ -115,6 +122,7 @@ try:
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0)
         isend = False
+        page = 0
         iteration_number = 0
         wave_number = 0
         paths = [[tuple(map(int, line.split())) for line in open_file(
@@ -260,7 +268,40 @@ try:
                     if e.type == pygame.QUIT:
                         sys.exit()
                 if button_start.try_push(events):
-                    state = 'NORMAL'
+                    state = 'IN_CHOOSE_LEVEL_MENU'
+            elif state == 'IN_CHOOSE_LEVEL_MENU':
+                screen.blit(background, (0, 0))
+                table, level_imgs, arrow_left, arrow_right = load_images('level_buttons', ['table.png',
+                                                                                           [str(i) + '.png' for i in
+                                                                                            range(1, NUMBER_OF_LEVELS +
+                                                                                                  1)],
+                                                                                           'left.png', 'right.png'],
+                                                                         0.90, 0.90)
+                screen.blit(table, (140, 30))
+                level_buttons = [Button(level_imgs[i], i % 4 * 200 + 190, 180 if i // 4 % 2 == 0 else 380, id=i) for i in
+                                 range(NUMBER_OF_LEVELS)]
+                next_button, prev_button = Button(arrow_right, 936, 531), Button(arrow_left, 50, 531)
+                # (966, 561)
+                # (106, 549)
+                for btn in level_buttons[8 * page:8 * page + 8]:
+                    btn.draw(screen)
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == pygame.QUIT:
+                        sys.exit()
+                if page != 0:
+                    if prev_button.try_push(events):
+                        page -= 1
+                    prev_button.draw(screen)
+                elif page != NUMBER_OF_LEVELS // 8 - 1:
+                    if next_button.try_push(events):
+                        page += 1
+                    next_button.draw(screen)
+                for btn in level_buttons[8 * page:8 * page + 8]:
+                    if btn.try_push(events):
+                        WAVES = LEVELS[btn.kwargs['id']].waves
+                        level = btn.kwargs['id']
+                        state = 'NORMAL'
             pygame.time.delay(DELAY)
             pygame.display.flip()
 
