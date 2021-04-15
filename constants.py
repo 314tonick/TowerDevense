@@ -7,15 +7,20 @@ def get_levels():
     i = 0
     le = []
     for line in f.readlines():
-        le.append(Level(i, eval(line)))
+        le.append(Level(*eval(line)))
     f.close()
     return le
 
 
 class Level:
-    def __init__(self, number, waves):
+    def __init__(self, waves, lives, coins, onThree, onTwo, onOne, coinsOneStar, coinsTwoStar, coinsThreeStar):
+        self.onOne = onOne
+        self.onTwo = onTwo
+        self.onThree = onThree
+        self.coins = coins
+        self.lives = lives
         self.waves = waves
-        self.number = number
+        self.getCoins = [coinsOneStar, coinsTwoStar, coinsThreeStar]
 
 
 class Wave:
@@ -65,7 +70,7 @@ STONE_TOWERS = [
     {'type_': 1, 'uron': 20, 'speed': 0.5, 'range_': 180},
     {'type_': 2, 'uron': 35, 'speed': 0.6, 'range_': 220},
 ]
-COINS = 100
+COINS = 1000
 TOWER_WIDTH, TOWER_HEIGHT = 0.8, 0.8
 TOWER_SPEED = 0.4
 LEVELS = get_levels()

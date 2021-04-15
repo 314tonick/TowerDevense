@@ -89,6 +89,7 @@ try:
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
         level = 0
+        stars = open_file('history.txt').read()
         state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
@@ -238,16 +239,46 @@ try:
                         elif e.type == pygame.KEYUP:
                             state = 'NORMAL'
             elif state == 'WIN':
-                screen.fill((0, 255, 0))
-                font = pygame.font.Font(open_file('font.ttf'), 250)
-                screen.blit(font.render('YOU WIN!!!', True, (0, 0, 0)), (80, 150))
-                for e in pygame.event.get():
-                    if e.type == pygame.QUIT:
+                cnt_stars = 1
+                if LIVES >= LEVELS[level].onThree:
+                    cnt_stars = 3
+                elif LIVES >= LEVELS[level].onTwo:
+                    cnt_stars = 2
+                screen.blit(background, (0, 0))
+                table, button_menu, arrow_right, molnya = load_images('win', ['table.png',
+                                                                              'button_menu.png', 'arrow_right.png',
+                                                                              'zip.png'], 0.70, 0.70)
+                screen.blit(table, (340, 80))
+                next_level, to_menu = Button(arrow_right, 588, 558), Button(button_menu, 414, 558)
+                next_level.draw(screen)
+                to_menu.draw(screen)
+                stars_imgs = {i: pygame.transform.scale(load_img('level_buttons', f'star{i}.png'), (300, 164)) for i
+                              in [0, 1, 2, 3]}
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == pygame.QUIT:
                         sys.exit()
-                    elif e.type == pygame.MOUSEBUTTONUP:
-                        sys.exit()
-                    elif e.type == pygame.KEYUP:
-                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        print(pygame.mouse.get_pos())
+                screen.blit(stars_imgs[cnt_stars], (406, 210))
+                _font1 = pygame.font.Font(resource_path('font.ttf'), 35)
+                _font2 = pygame.font.Font(resource_path('font.ttf'), 30)
+                _font3 = pygame.font.Font(resource_path('font.ttf'), 70)
+                screen.blit(_font1.render('CONGRATULATIONS!', True, (219, 200, 153)), (414, 381))
+                screen.blit(_font2.render('LEVEL COMPLETE', True, (219, 200, 153)), (454, 421))
+                screen.blit(_font3.render('+' + str(LEVELS[level].getCoins[cnt_stars - 1]), True, (219, 200, 153)),
+                            (458, 462))
+                screen.blit(molnya, (585, 472))
+
+                if to_menu.try_push(events):
+                    state = 'IN_CHOOSE_LEVEL_MENU'
+                elif next_level.try_push(events):
+                    state = 'NORMAL'
+                    level += 1
+                    WAVES = LEVELS[level].waves
+                    LIVES = LEVELS[level].lives
+                    COINS = LEVELS[level].coins
+
             elif state == 'LOST':
                 screen.fill((255, 0, 0))
                 font = pygame.font.Font(open_file('font.ttf'), 250)
@@ -272,7 +303,6 @@ try:
                     state = 'IN_CHOOSE_LEVEL_MENU'
             elif state == 'IN_CHOOSE_LEVEL_MENU':
                 screen.blit(background, (0, 0))
-                stars = open_file('history.txt').read()
                 table, level_imgs, arrow_left, arrow_right = load_images('level_buttons', ['table.png',
                                                                                            [str(i) + '.png' for i in
                                                                                             range(1, NUMBER_OF_LEVELS +
@@ -280,7 +310,8 @@ try:
                                                                                            'left.png', 'right.png'],
                                                                          0.90, 0.90)
                 screen.blit(table, (140, 30))
-                stars_imgs = {str(i): pygame.transform.scale(load_img('level_buttons', f'star{i}.png'), (90, 50)) for i in [0, 1, 2, 3, 'X']}
+                stars_imgs = {str(i): pygame.transform.scale(load_img('level_buttons', f'star{i}.png'), (90, 50)) for i
+                              in [0, 1, 2, 3, 'X']}
                 level_buttons = [
                     Button(concatSurfaces(level_imgs[i], stars_imgs[stars[i]], (30, 85)), i % 4 * 200 + 190,
                            180 if i // 4 % 2 == 0 else 380, id=i) for i in
@@ -305,6 +336,8 @@ try:
                 for btn in level_buttons[8 * page:8 * page + 8]:
                     if btn.try_push(events) and stars[btn.kwargs['id']] != 'X':
                         WAVES = LEVELS[btn.kwargs['id']].waves
+                        COINS = LEVELS[btn.kwargs['id']].coins
+                        LIVES = LEVELS[btn.kwargs['id']].lives
                         level = btn.kwargs['id']
                         state = 'NORMAL'
             pygame.time.delay(DELAY)

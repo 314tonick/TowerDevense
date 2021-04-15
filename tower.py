@@ -67,7 +67,7 @@ class StoneTower(Tower):
             new_x, new_y = enemy.get_pos(100)
             self.stones.append(
                 Stone(self.x + 35, self.y + 43, new_x, new_y, self.stone_img,
-                      self.stone_imgs, 95))
+                      self.stone_imgs, 125))
             self.stones[-1].enemy = enemy
             self.stones[-1].isOnTower = True
             self.ready = False
