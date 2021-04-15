@@ -2,12 +2,6 @@ try:
     from utils import *
 
 
-    # def mixSurfaces(surface: pygame.Surface, *surfaces: pygame.Surface):
-    #     ret = surface.copy()
-    #     for sur in surfaces:
-    #         ret.blit(sur)
-
-
     def whatTheNewTower():
         keys = pygame.key.get_pressed()
         for b in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:
