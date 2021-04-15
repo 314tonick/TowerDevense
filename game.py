@@ -2,6 +2,13 @@ try:
     from utils import *
 
 
+    def concatSurfaces(s1: pygame.Surface, s2: pygame.Surface, s2_coords: tuple, make_copy=True):
+        if make_copy:
+            s1 = s1.copy()
+        s1.blit(s2, s2_coords)
+        return s1
+
+
     def whatTheNewTower():
         keys = pygame.key.get_pressed()
         for b in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:
@@ -265,6 +272,7 @@ try:
                     state = 'IN_CHOOSE_LEVEL_MENU'
             elif state == 'IN_CHOOSE_LEVEL_MENU':
                 screen.blit(background, (0, 0))
+                stars = open_file('history.txt').read()
                 table, level_imgs, arrow_left, arrow_right = load_images('level_buttons', ['table.png',
                                                                                            [str(i) + '.png' for i in
                                                                                             range(1, NUMBER_OF_LEVELS +
@@ -272,8 +280,11 @@ try:
                                                                                            'left.png', 'right.png'],
                                                                          0.90, 0.90)
                 screen.blit(table, (140, 30))
-                level_buttons = [Button(level_imgs[i], i % 4 * 200 + 190, 180 if i // 4 % 2 == 0 else 380, id=i) for i in
-                                 range(NUMBER_OF_LEVELS)]
+                stars_imgs = {str(i): pygame.transform.scale(load_img('level_buttons', f'star{i}.png'), (90, 50)) for i in [0, 1, 2, 3, 'X']}
+                level_buttons = [
+                    Button(concatSurfaces(level_imgs[i], stars_imgs[stars[i]], (30, 85)), i % 4 * 200 + 190,
+                           180 if i // 4 % 2 == 0 else 380, id=i) for i in
+                    range(NUMBER_OF_LEVELS)]
                 next_button, prev_button = Button(arrow_right, 936, 531), Button(arrow_left, 50, 531)
                 # (966, 561)
                 # (106, 549)
@@ -292,7 +303,7 @@ try:
                         page += 1
                     next_button.draw(screen)
                 for btn in level_buttons[8 * page:8 * page + 8]:
-                    if btn.try_push(events):
+                    if btn.try_push(events) and stars[btn.kwargs['id']] != 'X':
                         WAVES = LEVELS[btn.kwargs['id']].waves
                         level = btn.kwargs['id']
                         state = 'NORMAL'
@@ -302,7 +313,7 @@ try:
 
     if __name__ == '__main__':
         main()
-except Exception as error:
+except IndexError as error:
     from tkinter.messagebox import showerror
 
     showerror('Error:', str(error.__class__) + str(error.args))
