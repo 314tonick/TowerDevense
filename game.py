@@ -1,7 +1,8 @@
+from utils import *
+
+stars = open_file('history.txt').read()
+
 try:
-    from utils import *
-
-
     def concatSurfaces(s1: pygame.Surface, s2: pygame.Surface, s2_coords: tuple, make_copy=True):
         if make_copy:
             s1 = s1.copy()
@@ -38,6 +39,7 @@ try:
 
 
     def main():
+        global stars
         from os import listdir
         import pygame
 
@@ -92,6 +94,7 @@ try:
                     return False
                 return True
 
+        plus = None
         WAVES = LEVELS[0].waves
         pygame.init()
         pygame.mixer.music.load(resource_path('fone.wav'))
@@ -102,7 +105,6 @@ try:
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
         level = 0
-        stars = open_file('history.txt').read()
         state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
@@ -188,6 +190,15 @@ try:
                             cnt_stars = 3
                         elif LIVES >= LEVELS[level].onTwo:
                             cnt_stars = 2
+                        stars = stars[:level] + str(max(cnt_stars, int(stars[level]))) + stars[level + 1:]
+                        plus = int(stars[NUMBER_OF_LEVELS + 1:]) + LEVELS[level].getCoins[
+                            cnt_stars - 1 - int(stars[level])]
+                        stars = stars[:NUMBER_OF_LEVELS + 2] + str(
+                            int(stars[NUMBER_OF_LEVELS + 1:]) + LEVELS[level].getCoins[
+                                cnt_stars - 1 - int(stars[level])])
+                        print(stars.find('X'))
+                        if level + 1 == stars.find('X'):
+                            stars = stars.replace('X', '0', 1)
                     for geroy in geroes:
                         if geroy.move():
                             LIVES -= geroy.fine
@@ -280,7 +291,7 @@ try:
                 _font3 = pygame.font.Font(resource_path('font.ttf'), 70)
                 screen.blit(_font1.render('CONGRATULATIONS!', True, (219, 200, 153)), (414, 381))
                 screen.blit(_font2.render('LEVEL COMPLETE', True, (219, 200, 153)), (454, 421))
-                screen.blit(_font3.render('+' + str(LEVELS[level].getCoins[cnt_stars - 1]), True, (219, 200, 153)),
+                screen.blit(_font3.render('+' + str(plus), True, (219, 200, 153)),
                             (458, 462))
                 screen.blit(molnya, (585, 472))
                 if to_menu.try_push(events):
@@ -374,7 +385,17 @@ try:
 
     if __name__ == '__main__':
         main()
-except IndexError as error:
+except SystemExit:
+    v = open(resource_path('history.txt'), 'w')
+    v.write(stars)
+    v.close()
+    print('done')
+
+except Exception as error:
+    v = open(resource_path('history.txt'), 'w')
+    v.write(stars)
+    v.close()
+    print('done')
     from tkinter.messagebox import showerror
 
     showerror('Error:', str(error.__class__) + str(error.args))
