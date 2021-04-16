@@ -146,7 +146,6 @@ class Stone:
         for image_ in explosion_imgs:
             for _ in range(5):
                 self.explosion_imgs.append(image_)
-        # self.explosion_imgs = explosion_imgs
         self.vx, self.vy, self.ay, self.tick_all, self.tick = 0, 0, 0.02, ticks, 0
         self.img = img
         self.goal_y = goal_y

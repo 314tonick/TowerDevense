@@ -270,6 +270,7 @@ try:
                             (458, 462))
                 screen.blit(molnya, (585, 472))
 
+
                 if to_menu.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
                 elif next_level.try_push(events):

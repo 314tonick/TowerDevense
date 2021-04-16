@@ -23,6 +23,7 @@ class Level:
         self.getCoins = [coinsOneStar, coinsTwoStar, coinsThreeStar]
 
 
+
 class Wave:
     def __init__(self, heroes, paths, lives, speed, wait_in, fines, rewards):
         self.wait = wait_in
