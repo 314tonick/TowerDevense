@@ -49,6 +49,18 @@ try:
             OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
             WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS, NUMBER_OF_LEVELS
 
+        def reset_level():
+            nonlocal iteration_number
+            nonlocal geroes
+            nonlocal selected_tower
+            nonlocal wave_number
+
+            geroes.clear()
+            bashni.clear()
+            iteration_number = 0
+            selected_tower = None
+            wave_number = 0
+
         def addStoneTower(num):
             px, py = pygame.mouse.get_pos()
             if num + 1 and COINS >= PRICES[num][0]:
@@ -269,12 +281,11 @@ try:
                 screen.blit(_font3.render('+' + str(LEVELS[level].getCoins[cnt_stars - 1]), True, (219, 200, 153)),
                             (458, 462))
                 screen.blit(molnya, (585, 472))
-
-
                 if to_menu.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
                 elif next_level.try_push(events):
                     state = 'NORMAL'
+                    reset_level()
                     level += 1
                     WAVES = LEVELS[level].waves
                     LIVES = LEVELS[level].lives
@@ -303,6 +314,7 @@ try:
                 if button_start.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
             elif state == 'IN_CHOOSE_LEVEL_MENU':
+                reset_level()
                 screen.blit(background, (0, 0))
                 table, level_imgs, arrow_left, arrow_right = load_images('level_buttons', ['table.png',
                                                                                            [str(i) + '.png' for i in
