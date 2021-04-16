@@ -4,7 +4,6 @@ from utils import resource_path
 
 def get_levels():
     f = open(resource_path('levels.txt'))
-    i = 0
     le = []
     for line in f.readlines():
         le.append(Level(*eval(line)))
@@ -22,6 +21,9 @@ class Level:
         self.waves = waves
         self.getCoins = [coinsOneStar, coinsTwoStar, coinsThreeStar]
 
+    def reset(self):
+        for wave in self.waves:
+            wave.reset()
 
 
 class Wave:
@@ -33,6 +35,9 @@ class Wave:
         self.heroes = heroes
         self.fines = fines
         self.rewards = rewards
+        self.i = 0
+
+    def reset(self):
         self.i = 0
 
     def next(self):

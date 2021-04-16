@@ -49,7 +49,7 @@ try:
             OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
             WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS, NUMBER_OF_LEVELS
 
-        def reset_level():
+        def reset_level(lev):
             nonlocal iteration_number
             nonlocal geroes
             nonlocal selected_tower
@@ -60,6 +60,7 @@ try:
             iteration_number = 0
             selected_tower = None
             wave_number = 0
+            LEVELS[lev].reset()
 
         def addStoneTower(num):
             px, py = pygame.mouse.get_pos()
@@ -131,7 +132,6 @@ try:
 
         background = load_img('game_background.png')
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-        screen = pygame.display.set_mode((WIDTH, HEIGHT))
         font = pygame.font.Font(resource_path('font.ttf'), 60)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0)
@@ -141,6 +141,8 @@ try:
         wave_number = 0
         paths = [[tuple(map(int, line.split())) for line in open_file(
             'paths', pathname).read().splitlines()] for pathname in listdir(resource_path('paths'))]
+        cnt_stars = 0
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
         while True:
             if state == 'PAUSE' or state == 'NORMAL':
                 screen.blit(background, (0, 0))
@@ -181,6 +183,11 @@ try:
                                 isend = True
                     except IndexError:
                         state = 'WIN'
+                        cnt_stars = 1
+                        if LIVES >= LEVELS[level].onThree:
+                            cnt_stars = 3
+                        elif LIVES >= LEVELS[level].onTwo:
+                            cnt_stars = 2
                     for geroy in geroes:
                         if geroy.move():
                             LIVES -= geroy.fine
@@ -251,11 +258,6 @@ try:
                         elif e.type == pygame.KEYUP:
                             state = 'NORMAL'
             elif state == 'WIN':
-                cnt_stars = 1
-                if LIVES >= LEVELS[level].onThree:
-                    cnt_stars = 3
-                elif LIVES >= LEVELS[level].onTwo:
-                    cnt_stars = 2
                 screen.blit(background, (0, 0))
                 table, button_menu, arrow_right, molnya = load_images('win', ['table.png',
                                                                               'button_menu.png', 'arrow_right.png',
@@ -283,25 +285,39 @@ try:
                 screen.blit(molnya, (585, 472))
                 if to_menu.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
+                    reset_level(level)
                 elif next_level.try_push(events):
                     state = 'NORMAL'
-                    reset_level()
+                    reset_level(level)
                     level += 1
                     WAVES = LEVELS[level].waves
                     LIVES = LEVELS[level].lives
                     COINS = LEVELS[level].coins
-
             elif state == 'LOST':
-                screen.fill((255, 0, 0))
-                font = pygame.font.Font(open_file('font.ttf'), 250)
-                screen.blit(font.render('YOU LOST!!!', True, (0, 0, 0)), (0, 150))
-                for e in pygame.event.get():
-                    if e.type == pygame.QUIT:
+                screen.blit(background, (0, 0))
+                table, button_menu, restart = load_images('failed', ['table.png',
+                                                                     'button_menu.png', 'button_restart.png',
+                                                                     ], 0.70, 0.70)
+                screen.blit(table, (340, 80))
+                restart, to_menu = Button(restart, 588, 538), Button(button_menu, 414, 538)
+                restart.draw(screen)
+                to_menu.draw(screen)
+                events = pygame.event.get()
+                for event in events:
+                    if event.type == pygame.QUIT:
                         sys.exit()
-                    elif e.type == pygame.MOUSEBUTTONUP:
-                        sys.exit()
-                    elif e.type == pygame.KEYUP:
-                        sys.exit()
+                _font2 = pygame.font.Font(resource_path('font.ttf'), 35)
+                _font1 = pygame.font.Font(resource_path('font.ttf'), 70)
+                screen.blit(_font1.render('SORRY :(', True, (219, 200, 153)), (435, 383))
+                screen.blit(_font2.render('LEVEL FAILED', True, (219, 200, 153)), (466, 460))
+                if to_menu.try_push(events):
+                    state = 'IN_CHOOSE_LEVEL_MENU'
+                elif restart.try_push(events):
+                    state = 'NORMAL'
+                    reset_level(level)
+                    WAVES = LEVELS[level].waves
+                    LIVES = LEVELS[level].lives
+                    COINS = LEVELS[level].coins
             elif state == 'IN_START_MENU':
                 screen.blit(background, (0, 0))
                 font_ = pygame.font.Font(resource_path('font.ttf'), 150)
@@ -314,7 +330,6 @@ try:
                 if button_start.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
             elif state == 'IN_CHOOSE_LEVEL_MENU':
-                reset_level()
                 screen.blit(background, (0, 0))
                 table, level_imgs, arrow_left, arrow_right = load_images('level_buttons', ['table.png',
                                                                                            [str(i) + '.png' for i in
