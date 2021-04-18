@@ -159,7 +159,7 @@ try:
                 for geroy in geroes:
                     geroy.draw()
                 for bas in bashni:
-                    bas.draw(screen)
+                    bas.update_and_draw(screen)
                 for button in addStoneTowerButtons:
                     button.draw(screen)
                 if state == 'NORMAL':
@@ -190,9 +190,10 @@ try:
                             cnt_stars = 3
                         elif LIVES >= LEVELS[level].onTwo:
                             cnt_stars = 2
-                        stars = stars[:level] + str(max(cnt_stars, int(stars[level]))) + stars[level + 1:]
-                        plus = int(stars[NUMBER_OF_LEVELS + 1:]) + LEVELS[level].getCoins[
-                            cnt_stars - 1 - int(stars[level])]
+                        if int(stars[level]) < cnt_stars:
+                            stars = stars[:level] + str(max(cnt_stars, int(stars[level]))) + stars[level + 1:]
+                            plus = LEVELS[level].getCoins[
+                                cnt_stars - 1 - int(stars[level])]
                         stars = stars[:NUMBER_OF_LEVELS + 2] + str(
                             int(stars[NUMBER_OF_LEVELS + 1:]) + LEVELS[level].getCoins[
                                 cnt_stars - 1 - int(stars[level])])
@@ -283,17 +284,16 @@ try:
                 for event in events:
                     if event.type == pygame.QUIT:
                         sys.exit()
-                    if event.type == pygame.MOUSEBUTTONUP:
-                        print(pygame.mouse.get_pos())
                 screen.blit(stars_imgs[cnt_stars], (406, 210))
                 _font1 = pygame.font.Font(resource_path('font.ttf'), 35)
                 _font2 = pygame.font.Font(resource_path('font.ttf'), 30)
                 _font3 = pygame.font.Font(resource_path('font.ttf'), 70)
                 screen.blit(_font1.render('CONGRATULATIONS!', True, (219, 200, 153)), (414, 381))
                 screen.blit(_font2.render('LEVEL COMPLETE', True, (219, 200, 153)), (454, 421))
-                screen.blit(_font3.render('+' + str(plus), True, (219, 200, 153)),
-                            (458, 462))
-                screen.blit(molnya, (585, 472))
+                if plus:
+                    screen.blit(_font3.render('+' + str(plus), True, (219, 200, 153)),
+                                (458, 462))
+                    screen.blit(molnya, (585, 472))
                 if to_menu.try_push(events):
                     state = 'IN_CHOOSE_LEVEL_MENU'
                     reset_level(level)
