@@ -49,6 +49,8 @@ class Wave:
                 self.i - 1], self.rewards[self.i - 1]
 
 
+LENGTH_OF_FREEZE = 50
+FREEZE_COST = 50
 WIDTH = 1160
 HEIGHT = 700
 HERO_WIDTH = HERO_HEIGHT = 100

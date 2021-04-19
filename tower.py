@@ -118,7 +118,9 @@ class StoneTower(Tower):
         self.range += 30
         self.upgradeButton = Button(
             pygame.transform.scale(load_img(*UPGRADE_IMG), (50, 50)), (self.range * 2 - self.width) // 2,
-            self.range * 2 - (self.range * 2 - self.height) // 2, self.costs[self.level + 1] if self.level < 2 else 0)
+                                                                      self.range * 2 - (
+                                                                              self.range * 2 - self.height) // 2,
+            self.costs[self.level + 1] if self.level < 2 else 0)
         self.sellButton = Button(pygame.transform.scale(load_img(*SELL_IMG), (50, 50)),
                                  self.range * 2 - (self.range * 2 - self.width) // 2 - 50,
                                  self.range * 2 - (self.range * 2 - self.height) // 2, self.costs[3])
@@ -181,7 +183,7 @@ class Stone:
 
 
 class Button:
-    def __init__(self, img, x, y, cost: int = None, **kwargs):
+    def __init__(self, img, x, y, cost: int = None, is_normally=True, **kwargs):
         self.kwargs = kwargs
         self.x, self.y, self.img = x, y, img
         self.width, self.height = self.img.get_size()
@@ -191,18 +193,24 @@ class Button:
         self.cost_rect = pygame.rect.Rect(self.x + self.width - self.width / 1.4 + 5,
                                           self.y + self.height - self.height / 2.6 + 3, self.width / 1.4,
                                           self.height / 2.6)
+        self.is_normally = is_normally
 
     def draw(self, screen):
         screen.blit(self.img, self.rect)
         if self.cost:
             font_ = pygame.font.Font(resource_path('font.ttf'), self.height // 5)
             screen.blit(self.cost_img, self.cost_rect)
-            screen.blit(font_.render(str(self.cost), True, (243, 220, 20)), self.cost_rect.move(self.width // 15, self.height // 15))
+            screen.blit(font_.render(str(self.cost), True, (243, 220, 20)),
+                        self.cost_rect.move(self.width // 15, self.height // 15))
+        if not self.is_normally:
+            surface = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+            surface.fill((100, 100, 100, 100))
+    # screen.blit(pygame.transform.scale(load_img('buttons', 'noname.png'), (self.width, self.height)), self.rect)
+            screen.blit(surface, self.rect)
 
     def try_push(self, events, move_x=0, move_y=0, eventTypeRequire=pygame.MOUSEBUTTONUP):
-        return self.rect.move(move_x, move_y).collidepoint(*pygame.mouse.get_pos()) and eventTypeRequire in [e.type for
-                                                                                                             e in events
-                                                                                                             ]
+        return self.is_normally and self.rect.move(move_x, move_y).collidepoint(
+            *pygame.mouse.get_pos()) and eventTypeRequire in [e.type for e in events]
 
 
 class StoneTowerFirstType(StoneTower):

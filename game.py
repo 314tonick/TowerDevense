@@ -1,3 +1,4 @@
+from constants import FREEZE_COST, LENGTH_OF_FREEZE
 from utils import *
 
 stars = open_file('history.txt').read()
@@ -94,6 +95,7 @@ try:
                     return False
                 return True
 
+        # Подготовка остального
         plus = None
         WAVES = LEVELS[0].waves
         pygame.init()
@@ -119,19 +121,8 @@ try:
             addStoneTowerButtons.append(
                 Button(pygame.transform.scale(load_img('buttons', f'tower{number}.png'), (80, 80)), WIDTH - 110,
                        180 + 100 * number, PRICES[number][0]))
-        UI_elements = addStoneTowerButtons
-        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
-                              180 + 3 * 100)
-        UI_elements.append(button_pause)
-        selected_tower = None
-        for hero_name in [GOBLIN, SCORPION, OLD_MAN]:
-            images.update(
-                {hero_name: [pygame.transform.scale(load_img(hero_name, 'walk', filename), (HERO_WIDTH, HERO_HEIGHT))
-                             for filename in listdir(resource_path(hero_name, 'walk'))]})
-        button_start = Button(pygame.transform.scale(load_img('buttons', 'start.png'), (400, 400)), 350, 250)
-        coin = pygame.transform.scale(load_img('buttons', 'money.png'), (180, 80))
-        cerdce = pygame.transform.scale(load_img('buttons', 'lives.png'), (180, 80))
 
+        freeze = 0
         background = load_img('game_background.png')
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         font = pygame.font.Font(resource_path('font.ttf'), 60)
@@ -145,9 +136,42 @@ try:
             'paths', pathname).read().splitlines()] for pathname in listdir(resource_path('paths'))]
         cnt_stars = 0
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+        # Создание UI
+        UI_elements = addStoneTowerButtons
+        button_destroy_everyone = Button(pygame.transform.scale(load_img('buttons', 'destroy_everyone.png'), (80, 80)),
+                                         WIDTH - 210, 180)
+        button_freeze = Button(pygame.transform.scale(load_img('buttons', 'freeze.png'), (80, 80)), WIDTH - 210,
+                               180 + 100, FREEZE_COST)
+        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
+                              180 + 2 * 100)
+        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
+                              180 + 3 * 100)
+        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
+                              180 + 3 * 100)
+
+        UI_elements.append(button_pause)
+        UI_elements.append(button_destroy_everyone)
+        UI_elements.append(button_freeze)
+        selected_tower = None
+        for hero_name in [GOBLIN, SCORPION, OLD_MAN]:
+            images.update(
+                {hero_name: [pygame.transform.scale(load_img(hero_name, 'walk', filename), (HERO_WIDTH, HERO_HEIGHT))
+                             for filename in listdir(resource_path(hero_name, 'walk'))]})
+        button_start = Button(pygame.transform.scale(load_img('buttons', 'start.png'), (400, 400)), 350, 250)
+        coin = pygame.transform.scale(load_img('buttons', 'money.png'), (180, 80))
+        cerdce = pygame.transform.scale(load_img('buttons', 'lives.png'), (180, 80))
         while True:
             if state == 'PAUSE' or state == 'NORMAL':
                 screen.blit(background, (0, 0))
+                # -----------О-Б-Н-О-В-Л-Е-Н-И-Е--Э-Л-Е-М-Е-Н-Т-О-В--U-I-----------
+                try:
+                    button_destroy_everyone.cost = sum([ene.lives for ene in geroes]) // len(geroes) * 2
+                    button_destroy_everyone.is_normally = bool(button_destroy_everyone.cost)
+                except ZeroDivisionError:
+                    button_destroy_everyone.is_normally = False
+                button_freeze.is_normally = len(geroes) and (not freeze)
+
                 # ----------------------О-Т-Р-И-С-О-В-К-А--U-I---------------------
                 for UI_element in UI_elements:
                     UI_element.draw(screen)
@@ -155,19 +179,23 @@ try:
                 screen.blit(font.render(str(LIVES), True, (180, 0, 0)), (WIDTH - 165, 4))
                 screen.blit(coin, (WIDTH - 190, 90))
                 screen.blit(font.render(str(COINS), True, (180, 180, 0)), (WIDTH - 165, 90))
-                # -----О-Т-Р-И-С-О-В-К-А--О-С-Т-А-Л-Ь-Н-Ы-Х---Э-Л-М-Е-Н-Т-О-В-------
+
+                # ------О-Т-Р-И-С-О-В-К-А--О-С-Т-А-Л-Ь-Н-Ы-Х---Э-Л-М-Е-Н-Т-О-В------
                 for geroy in geroes:
                     geroy.draw()
                 for bas in bashni:
-                    bas.update_and_draw(screen)
+                    bas.draw(screen)
                 for button in addStoneTowerButtons:
                     button.draw(screen)
                 if state == 'NORMAL':
+                    if freeze:
+                        freeze -= 1
                     if selected_tower:
                         selected_tower.x, selected_tower.y = pygame.mouse.get_pos()
                         selected_tower.x -= selected_tower.width // 2
                         selected_tower.y -= selected_tower.height // 2
                         selected_tower.draw(screen)
+                    # Добавление врагов, обработка выигрыша.
                     iteration_number += 1
                     if isend and len(geroes):
                         iteration_number -= 1
@@ -200,10 +228,13 @@ try:
                         print(stars.find('X'))
                         if level + 1 == stars.find('X'):
                             stars = stars.replace('X', '0', 1)
-                    for geroy in geroes:
-                        if geroy.move():
-                            LIVES -= geroy.fine
-                            geroes.remove(geroy)
+                    # Enemy.move
+                    if not freeze:
+                        for geroy in geroes:
+                            if geroy.move():
+                                LIVES -= geroy.fine
+                                geroes.remove(geroy)
+                    # StoneTower.update
                     for bas in bashni:
                         for enemy in bas.update() + bas.update():
                             try:
@@ -214,6 +245,7 @@ try:
                                     COINS += enemy.reward
                             except ValueError:
                                 pass
+                    # StoneTower.attack
                     for bas in bashni:
                         for geroy in geroes:
                             x, y = geroy.get_pos(95)
@@ -232,13 +264,21 @@ try:
                                 if addStoneTower(selected_tower.type):
                                     COINS -= PRICES[selected_tower.type][0]
                                 selected_tower = None
+                            else:
+                                print(pygame.mouse.get_pos())
                         elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                             state = 'PAUSE'
+                    if button_destroy_everyone.try_push(events) and COINS >= button_destroy_everyone.cost:
+                        COINS -= sum([ene.lives for ene in geroes]) // 3
+                        geroes.clear()
+                    if button_pause.try_push(events):
+                        state = 'PAUSE'
+                    if button_freeze.try_push(events) and COINS >= FREEZE_COST:
+                        freeze = LENGTH_OF_FREEZE
+                        COINS -= FREEZE_COST
                     for number in range(3):
                         if addStoneTowerButtons[number].try_push(events, eventTypeRequire=pygame.MOUSEBUTTONDOWN):
                             selected_tower = addStoneTowerTowers[number]
-                    if button_pause.try_push(events):
-                        state = 'PAUSE'
                     for bas in bashni:
                         if pygame.rect.Rect(bas.x, bas.y, bas.width, bas.height + 50).collidepoint(
                                 *pygame.mouse.get_pos()):
