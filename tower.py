@@ -35,7 +35,7 @@ class UnionElements:
 
     def draw(self, screen):
         for e in self.elements:
-            e.update_and_draw(screen)
+            e.draw(screen)
 
 
 class StoneTower(Tower):
@@ -64,10 +64,10 @@ class StoneTower(Tower):
     def attack(self, enemy):
         if self.ready:
             enemy.now_uron += self.uron
-            new_x, new_y = enemy.get_pos(100)
+            new_x, new_y = enemy.get_pos(130)
             self.stones.append(
                 Stone(self.x + 35, self.y + 43, new_x, new_y, self.stone_img,
-                      self.stone_imgs, 100 + int(float(self.height) / self.speed / 2.0)))
+                      self.stone_imgs, 100))
             self.stones[-1].enemy = enemy
             self.stones[-1].isOnTower = True
             self.ready = False
@@ -104,12 +104,12 @@ class StoneTower(Tower):
         screen.blit(self.imgs[self.level][0], (self.x, self.y + self.pos))
         for stn in self.stones:
             if stn.isOnTower:
-                stn.update_and_draw(screen)
+                stn.draw(screen)
         screen.blit(self.imgs[self.level][2], (self.x, self.y))
         screen.blit(self.imgs[self.level][1], (self.x, self.y + self.pos + self.imgs[self.level][0].get_height() - 2))
         for stn in self.stones:
             if not stn.isOnTower:
-                stn.update_and_draw(screen)
+                stn.draw(screen)
 
     def upgrade(self):
         super(StoneTower, self).upgrade()
@@ -233,7 +233,7 @@ class StoneTowerSecondType(StoneTower):
             stn.y -= y
             stn.x += x
             if stn.isOnTower:
-                stn.update_and_draw(screen)
+                stn.draw(screen)
             stn.x -= x
             stn.y += y
         screen.blit(self.imgs[self.level][2], (self.x, self.y))
@@ -243,7 +243,7 @@ class StoneTowerSecondType(StoneTower):
             stn.x += x
             stn.y -= y
             if not stn.isOnTower:
-                stn.update_and_draw(screen)
+                stn.draw(screen)
             stn.x -= x
             stn.y += y
 
@@ -260,7 +260,7 @@ class StoneTowerThirdType(StoneTower):
             u = 10 * self.level
             if stn.isOnTower:
                 stn.y += u
-                stn.update_and_draw(screen)
+                stn.draw(screen)
                 stn.y -= u
         screen.blit(self.imgs[self.level][2], (self.x, self.y))
         screen.blit(self.imgs[self.level][1],
@@ -270,5 +270,5 @@ class StoneTowerThirdType(StoneTower):
             u = 10 * self.level
             if not stn.isOnTower:
                 stn.y += u
-                stn.update_and_draw(screen)
+                stn.draw(screen)
                 stn.y -= u
