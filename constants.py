@@ -12,7 +12,7 @@ def get_levels():
 
 
 class Level:
-    def __init__(self, waves, lives, coins, onThree, onTwo, onOne, coinsOneStar, coinsTwoStar, coinsThreeStar):
+    def __init__(self, waves, lives, coins, onThree, onTwo, onOne, coinsOneStar, coinsTwoStar, coinsThreeStar, ifLost):
         self.onOne = onOne
         self.onTwo = onTwo
         self.onThree = onThree
@@ -20,6 +20,7 @@ class Level:
         self.lives = lives
         self.waves = waves
         self.getCoins = [coinsOneStar, coinsTwoStar, coinsThreeStar]
+        self.ifLost = ifLost
 
     def reset(self):
         for wave in self.waves:
@@ -83,3 +84,4 @@ TOWER_WIDTH, TOWER_HEIGHT = 0.8, 0.8
 TOWER_SPEED = 0.4
 LEVELS = get_levels()
 NUMBER_OF_LEVELS = len(LEVELS)
+print(NUMBER_OF_LEVELS)

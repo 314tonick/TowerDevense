@@ -2,7 +2,6 @@ from utils import *
 import pygame
 
 # from constants import SELL_IMG, UPGRADE_IMG - I commented this because, it throws the ImportError
-
 UPGRADE_IMG = 'buttons', 'upgrade.png'
 SELL_IMG = 'buttons', 'sell.png'
 COST_IMG = 'buttons', 'cost.png'

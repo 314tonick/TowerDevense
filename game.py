@@ -107,6 +107,7 @@ try:
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
         level = 0
+        number_of_lost = 0
         state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
@@ -219,12 +220,13 @@ try:
                         elif LIVES >= LEVELS[level].onTwo:
                             cnt_stars = 2
                         if int(stars[level]) < cnt_stars:
+                            plus = LEVELS[level].getCoins[cnt_stars - 1] - (
+                                0 if not int(stars[level]) else LEVELS[level].getCoins[int(stars[level]) - 1])
                             stars = stars[:level] + str(max(cnt_stars, int(stars[level]))) + stars[level + 1:]
-                            plus = LEVELS[level].getCoins[
-                                cnt_stars - 1 - int(stars[level])]
-                        stars = stars[:NUMBER_OF_LEVELS + 2] + str(
-                            int(stars[NUMBER_OF_LEVELS + 1:]) + LEVELS[level].getCoins[
-                                cnt_stars - 1 - int(stars[level])])
+                        print(int(stars[NUMBER_OF_LEVELS + 1:]))
+                        if plus:
+                            stars = stars[:NUMBER_OF_LEVELS + 1] + str(
+                                int(stars[NUMBER_OF_LEVELS + 1:]) + plus)
                         print(stars.find('X'))
                         if level + 1 == stars.find('X'):
                             stars = stars.replace('X', '0', 1)
@@ -254,7 +256,19 @@ try:
                                 bas.attack(geroy)
                                 break
                     if LIVES <= 0:
-                        state = 'LOST'
+                        if number_of_lost >= len(LEVELS[level].ifLost) or int(stars[NUMBER_OF_LEVELS + 1:]) < \
+                                LEVELS[level].ifLost[number_of_lost]:
+                            state = 'LOST'
+                        else:
+                            if input(LEVELS[level].ifLost[number_of_lost]) == 'y':
+                                print(stars)
+                                stars = stars[:NUMBER_OF_LEVELS + 1] + str(
+                                    int(stars[NUMBER_OF_LEVELS + 1:]) - LEVELS[level].ifLost[number_of_lost])
+                                print(stars)
+                                number_of_lost += 1
+                                LIVES = 5
+                            else:
+                                state = 'LOST'
                     events = pygame.event.get()
                     for event in events:
                         if event.type == pygame.QUIT:
@@ -439,3 +453,4 @@ except Exception as error:
     from tkinter.messagebox import showerror
 
     showerror('Error:', str(error.__class__) + str(error.args))
+    raise error
