@@ -49,8 +49,8 @@ try:
         from tower import StoneTower, StoneTowerSecondType, Button, StoneTowerThirdType
         import sys
         from constants import WIDTH, HEIGHT, HERO_WIDTH, HERO_HEIGHT, GOBLIN, SCORPION, STONE_TOWERS, \
-            OLD_MAN, DELAY, LIVES, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
-            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS, NUMBER_OF_LEVELS
+            OLD_MAN, DELAY, STONE_TOWER, STONE_TOWER_IMG, TOWER_WIDTH, TOWER_HEIGHT, \
+            WAIT_BETWEEN_WAVES, STONE_IMGS, COINS, LEVELS, NUMBER_OF_LEVELS, LIVES_ON_HELP
 
         def reset_level(lev):
             nonlocal iteration_number
@@ -107,7 +107,7 @@ try:
         addStoneTowerTowers = []
         TowerPlaces = eval(open_file('TowerPlaces.txt').read())
         level = 0
-        number_of_lost = 0
+        number_of_lost = float('inf')
         state = "IN_START_MENU"  # NORMAL, PAUSE, WIN, LOST, IN_START_MENU, IN_CHOOSE_LEVEL_MENU
         for number in range(3):
             x, y = pygame.mouse.get_pos()
@@ -127,11 +127,13 @@ try:
         background = load_img('game_background.png')
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         font = pygame.font.Font(resource_path('font.ttf'), 60)
+        font220 = pygame.font.Font(resource_path('font.ttf'), 220)
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0)
         isend = False
         page = 0
         iteration_number = 0
+        LIVES = 0
         wave_number = 0
         paths = [[tuple(map(int, line.split())) for line in open_file(
             'paths', pathname).read().splitlines()] for pathname in listdir(resource_path('paths'))]
@@ -144,13 +146,12 @@ try:
                                          WIDTH - 210, 180)
         button_freeze = Button(pygame.transform.scale(load_img('buttons', 'freeze.png'), (80, 80)), WIDTH - 210,
                                180 + 100, FREEZE_COST)
-        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
-                              180 + 2 * 100)
+        # button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
+        #                       180 + 2 * 100)
+        # button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
+        #                       180 + 3 * 100)
         button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
                               180 + 3 * 100)
-        button_pause = Button(pygame.transform.scale(load_img('buttons', 'pause.png'), (80, 80)), WIDTH - 110,
-                              180 + 3 * 100)
-
         UI_elements.append(button_pause)
         UI_elements.append(button_destroy_everyone)
         UI_elements.append(button_freeze)
@@ -162,6 +163,9 @@ try:
         button_start = Button(pygame.transform.scale(load_img('buttons', 'start.png'), (400, 400)), 350, 250)
         coin = pygame.transform.scale(load_img('buttons', 'money.png'), (180, 80))
         cerdce = pygame.transform.scale(load_img('buttons', 'lives.png'), (180, 80))
+        m = pygame.transform.scale(load_img('buttons', 'help.png'), (447, 560))
+        buy = Button(pygame.transform.scale(load_img('buttons', 'cost.png'), (150, 90)), 399, 501)
+        skip = Button(pygame.transform.scale(load_img('buttons', 'skip.png'), (150, 90)), 580, 501)
         while True:
             if state == 'PAUSE' or state == 'NORMAL':
                 screen.blit(background, (0, 0))
@@ -256,19 +260,14 @@ try:
                                 bas.attack(geroy)
                                 break
                     if LIVES <= 0:
+                        print(number_of_lost, len(LEVELS[level].ifLost), int(stars[NUMBER_OF_LEVELS + 1:]),
+                              LEVELS[level].ifLost[number_of_lost])
                         if number_of_lost >= len(LEVELS[level].ifLost) or int(stars[NUMBER_OF_LEVELS + 1:]) < \
                                 LEVELS[level].ifLost[number_of_lost]:
                             state = 'LOST'
                         else:
-                            if input(LEVELS[level].ifLost[number_of_lost]) == 'y':
-                                print(stars)
-                                stars = stars[:NUMBER_OF_LEVELS + 1] + str(
-                                    int(stars[NUMBER_OF_LEVELS + 1:]) - LEVELS[level].ifLost[number_of_lost])
-                                print(stars)
-                                number_of_lost += 1
-                                LIVES = 5
-                            else:
-                                state = 'LOST'
+                            state = 'HELP'
+                            continue
                     events = pygame.event.get()
                     for event in events:
                         if event.type == pygame.QUIT:
@@ -303,8 +302,8 @@ try:
                                 bashni.remove(bas)
                                 COINS += PRICES[bas.type][3]
                             elif bas.upgradeButton.try_push(events, bas.x + bas.width // 2 - radius,
-                                                            bas.y + bas.height // 2 - radius) and bas.level <= 1 and COINS >= \
-                                    PRICES[bas.type][bas.level + 1]:
+                                                            bas.y + bas.height // 2 - radius) and bas.level <= 1 and \
+                                    COINS >= PRICES[bas.type][bas.level + 1]:
                                 COINS -= PRICES[bas.type][bas.level + 1]
                                 bas.upgrade()
                     for y in range(len(TowerPlaces)):
@@ -433,6 +432,28 @@ try:
                         LIVES = LEVELS[btn.kwargs['id']].lives
                         level = btn.kwargs['id']
                         state = 'NORMAL'
+                        number_of_lost = 0
+            elif state == 'HELP':
+                events = pygame.event.get()
+                for e in events:
+                    if e.type == pygame.QUIT:
+                        exit()
+                    elif e.type == pygame.MOUSEBUTTONUP:
+                        print(pygame.mouse.get_pos())
+                screen.blit(m, (340, 80))
+                buy.draw(screen)
+                skip.draw(screen)
+                cost = LEVELS[level].ifLost[number_of_lost]
+                buy.img.blit(font.render(str(cost), True, (255, 255, 0)), (20, 5))
+                m.blit(font220.render(str(LIVES_ON_HELP), True, (255, 0, 0)), (130, 80))
+                if skip.try_push(events):
+                    state = 'LOST'
+                if buy.try_push(events):
+                    stars = stars[:NUMBER_OF_LEVELS + 1] + str(
+                        int(stars[NUMBER_OF_LEVELS + 1:]) - cost)
+                    number_of_lost += 1
+                    state = 'NORMAL'
+                    LIVES = LIVES_ON_HELP
             pygame.time.delay(DELAY)
             pygame.display.flip()
 
@@ -443,13 +464,13 @@ except SystemExit:
     v = open(resource_path('history.txt'), 'w')
     v.write(stars)
     v.close()
-    print('done')
+    print('saved')
 
 except Exception as error:
     v = open(resource_path('history.txt'), 'w')
     v.write(stars)
     v.close()
-    print('done')
+    print('saved')
     from tkinter.messagebox import showerror
 
     showerror('Error:', str(error.__class__) + str(error.args))

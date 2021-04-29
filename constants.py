@@ -58,8 +58,8 @@ HERO_WIDTH = HERO_HEIGHT = 100
 WAIT_BETWEEN_WAVES = 100
 SCORPION, OLD_MAN, GOBLIN = 'scorpion', 'oldMan', 'goblin'
 STONE_TOWER_CLASSES = [StoneTowerFirstType, StoneTowerSecondType, StoneTowerThirdType]
-LIVES = 20
 PRICES = [[50, 20, 30, 25], [90, 30, 50, 45], [150, 50, 100, 75]]
+LIVES_ON_HELP = 5
 DELAY = 4
 STONE_TOWER = 'stone_tower'
 STONE_TOWER_IMG = [
